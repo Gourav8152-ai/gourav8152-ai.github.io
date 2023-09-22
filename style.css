@@ -13,6 +13,10 @@
     padding: 0 80px;
     margin: auto;
 }
+
+.home-content {
+    padding-left: 141px;
+}
 .navbar{
     position: fixed;
     width: 100%;
