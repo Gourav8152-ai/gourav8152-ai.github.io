@@ -1,108 +1,611 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gopu Portfolio</title>
-    <script src="https://kit.fontawesome.com/b9bb972247.js" crossorigin="anonymous"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <link rel="stylesheet" href="style.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gorav Agarwal — Product Analyst</title>
+<meta name="description" content="Product analyst at Amber, a global student housing marketplace. I work out why a number moved: funnel drops, A/B test results, and the tooling that makes those answers repeatable.">
+<meta name="author" content="Gorav Agarwal">
+<meta property="og:title" content="Gorav Agarwal — Product Analyst">
+<meta property="og:description" content="Product analyst at Amber. Funnel drops, A/B test results, and the tooling that makes those answers repeatable.">
+<meta property="og:type" content="profile">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23b45309'/><path d='M22 70 L42 48 L58 60 L78 30' stroke='white' stroke-width='9' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" rel="stylesheet">
+<style>
+/* ============================ tokens ============================ */
+:root{
+  --bg:#faf9f7; --surface:#ffffff; --raised:#ffffff;
+  --fg:#16161a; --muted:#5c5c66; --faint:#8b8b95;
+  --line:#e6e3dd; --line-soft:#f0ede7;
+  --accent:#b45309; --accent-ink:#ffffff; --accent-soft:#fdf5ea;
+  --mark:#ffeec9;
+  --s1:#2a78d6; --s2:#eb6834;      /* validated categorical pair (light) */
+  --grid:#eeece6;
+  --shadow:0 1px 2px rgba(20,18,14,.05), 0 8px 24px -12px rgba(20,18,14,.16);
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --serif:Newsreader,Georgia,"Iowan Old Style",serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0d0d0f; --surface:#141417; --raised:#17171b;
+    --fg:#ededf2; --muted:#9b9ba6; --faint:#6f6f7a;
+    --line:#24242a; --line-soft:#1c1c21;
+    --accent:#f0a33c; --accent-ink:#17120a; --accent-soft:#1e1710;
+    --mark:#33270f;
+    --s1:#3987e5; --s2:#d95926;    /* validated categorical pair (dark) */
+    --grid:#22222a;
+    --shadow:0 1px 2px rgba(0,0,0,.5), 0 10px 30px -14px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0d0d0f; --surface:#141417; --raised:#17171b;
+  --fg:#ededf2; --muted:#9b9ba6; --faint:#6f6f7a;
+  --line:#24242a; --line-soft:#1c1c21;
+  --accent:#f0a33c; --accent-ink:#17120a; --accent-soft:#1e1710;
+  --mark:#33270f;
+  --s1:#3987e5; --s2:#d95926;
+  --grid:#22222a;
+  --shadow:0 1px 2px rgba(0,0,0,.5), 0 10px 30px -14px rgba(0,0,0,.7);
+}
+
+/* ============================ base ============================ */
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%; scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto} }
+body{
+  margin:0; background:var(--bg); color:var(--fg);
+  font-family:var(--sans); font-size:16.5px; line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--accent); outline-offset:3px; border-radius:4px}
+h1,h2,h3{font-family:var(--serif); font-weight:500; letter-spacing:-.015em; line-height:1.14; margin:0}
+p{margin:0 0 1em} p:last-child{margin-bottom:0}
+.num{font-family:var(--mono); font-variant-numeric:tabular-nums; font-feature-settings:"tnum"}
+.kicker{
+  font-family:var(--mono); font-size:.68rem; letter-spacing:.13em;
+  text-transform:uppercase; color:var(--faint); font-weight:500;
+}
+.skip{position:absolute; left:-9999px}
+.skip:focus{left:8px; top:8px; z-index:99; background:var(--accent); color:var(--accent-ink); padding:8px 14px; border-radius:6px}
+
+/* ============================ shell ============================ */
+.shell{max-width:1180px; margin:0 auto; padding:0 20px}
+@media (min-width:1040px){
+  .shell{display:grid; grid-template-columns:232px minmax(0,1fr); gap:72px; padding:0 40px}
+}
+
+/* ---- left rail ---- */
+.rail{padding:40px 0 24px}
+@media (min-width:1040px){
+  .rail{position:sticky; top:0; align-self:start; height:100vh; padding:56px 0 32px;
+        display:flex; flex-direction:column}
+}
+.rail__name{font-size:1.5rem; margin-bottom:2px}
+.rail__role{font-size:.9rem; color:var(--muted); margin:0 0 20px}
+.rail__role b{color:var(--accent); font-weight:600}
+.nav{display:none}
+@media (min-width:1040px){
+  .nav{display:block; margin:6px 0 auto; border-left:1px solid var(--line)}
+  .nav a{
+    display:block; text-decoration:none; color:var(--faint);
+    font-size:.82rem; padding:5px 0 5px 14px; margin-left:-1px;
+    border-left:2px solid transparent; transition:color .15s, border-color .15s;
+  }
+  .nav a:hover{color:var(--fg)}
+  .nav a[aria-current="true"]{color:var(--fg); border-left-color:var(--accent); font-weight:600}
+}
+.rail__links{display:flex; flex-wrap:wrap; gap:8px; margin-top:18px}
+.btn{
+  display:inline-flex; align-items:center; gap:6px; text-decoration:none;
+  border:1px solid var(--line); background:var(--surface); color:var(--fg);
+  padding:7px 13px; border-radius:8px; font-size:.84rem; line-height:1.2;
+  cursor:pointer; font-family:var(--sans);
+  transition:border-color .15s, background .15s, transform .12s;
+}
+.btn:hover{border-color:var(--accent); background:var(--accent-soft)}
+.btn:active{transform:translateY(1px)}
+.btn--solid{background:var(--accent); border-color:var(--accent); color:var(--accent-ink); font-weight:600}
+.btn--solid:hover{background:var(--accent); filter:brightness(1.06)}
+.btn--icon{padding:7px 10px}
+
+/* ============================ content ============================ */
+main{padding-bottom:72px}
+.hero{padding:34px 0 8px}
+@media (min-width:1040px){ .hero{padding:104px 0 8px} }
+.hero h1{font-size:clamp(2.3rem,5.2vw,3.7rem); max-width:16ch; margin-bottom:.4em}
+.hero h1 em{font-style:normal; color:var(--accent)}
+.hero__sub{font-size:clamp(1.02rem,1.6vw,1.16rem); color:var(--muted); max-width:52ch; margin:0}
+
+/* ---- scale strip ---- */
+.scale{
+  display:grid; grid-template-columns:repeat(2,1fr); gap:1px;
+  background:var(--line); border:1px solid var(--line); border-radius:12px;
+  overflow:hidden; margin:36px 0 8px;
+}
+@media (min-width:620px){ .scale{grid-template-columns:repeat(4,1fr)} }
+.scale div{background:var(--surface); padding:16px 16px 14px}
+.scale dt{font-size:1.32rem; font-family:var(--mono); font-weight:600; letter-spacing:-.02em}
+.scale dd{margin:3px 0 0; font-size:.78rem; color:var(--faint); line-height:1.4}
+
+/* ---- sections ---- */
+section{padding:52px 0 0; scroll-margin-top:24px}
+.sec-head{display:flex; align-items:baseline; gap:14px; margin-bottom:26px}
+.sec-head::after{content:""; flex:1; height:1px; background:var(--line)}
+
+/* ---- case studies ---- */
+.case{
+  border:1px solid var(--line); border-radius:14px; background:var(--surface);
+  padding:26px; margin-bottom:22px; box-shadow:var(--shadow);
+}
+@media (min-width:760px){ .case{padding:32px 34px} }
+.case__top{display:flex; align-items:center; gap:10px; margin-bottom:12px; flex-wrap:wrap}
+.case__n{
+  font-family:var(--mono); font-size:.72rem; font-weight:600; color:var(--accent);
+  background:var(--accent-soft); border:1px solid color-mix(in srgb,var(--accent) 24%,transparent);
+  padding:2px 7px; border-radius:5px;
+}
+.case h3{font-size:clamp(1.25rem,2.4vw,1.5rem); margin:0 0 16px; max-width:42ch; text-wrap:balance}
+.case dl{margin:0; display:grid; gap:13px; max-width:66ch}
+.case dt{
+  font-family:var(--mono); font-size:.65rem; letter-spacing:.11em; text-transform:uppercase;
+  color:var(--faint); font-weight:500; margin-bottom:3px;
+}
+.case dd{margin:0; color:var(--muted)}
+.case dd strong{color:var(--fg); font-weight:600}
+mark{background:var(--mark); color:var(--fg); padding:.1em .3em; border-radius:4px; font-weight:600}
+
+/* ---- figures ---- */
+figure{margin:22px 0 0; border-top:1px solid var(--line-soft); padding-top:18px}
+.fig__head{display:flex; justify-content:space-between; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:10px}
+.fig__title{font-size:.88rem; font-weight:600}
+.legend{display:flex; gap:14px; flex-wrap:wrap}
+.legend span{display:inline-flex; align-items:center; gap:6px; font-size:.76rem; color:var(--muted)}
+.legend i{width:11px; height:11px; border-radius:3px; display:inline-block}
+.plot{overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch;
+      scrollbar-width:thin; padding-bottom:2px}
+svg.chart{display:block; width:100%; height:auto; overflow:visible; min-width:470px}
+@media (min-width:560px){ svg.chart{min-width:0} }
+figcaption{margin-top:10px; font-size:.79rem; color:var(--faint); line-height:1.5}
+details.data{margin-top:10px}
+details.data summary{
+  font-family:var(--mono); font-size:.7rem; letter-spacing:.06em; text-transform:uppercase;
+  color:var(--faint); cursor:pointer; padding:3px 0;
+}
+details.data summary:hover{color:var(--fg)}
+details.data table{border-collapse:collapse; margin-top:8px; font-size:.8rem; width:100%; max-width:440px}
+details.data th,details.data td{text-align:left; padding:4px 12px 4px 0; border-bottom:1px solid var(--line-soft); color:var(--muted)}
+details.data th{color:var(--fg); font-weight:600}
+details.data td:nth-child(n+2){font-family:var(--mono); text-align:right}
+
+/* chart primitives */
+.ax{stroke:var(--line); stroke-width:1}
+.gl{stroke:var(--grid); stroke-width:1}
+.tick{fill:var(--faint); font-size:10px; font-family:var(--mono)}
+.vlab{fill:var(--fg); font-size:11.5px; font-family:var(--mono); font-weight:600}
+.slab{font-size:11px; font-weight:600; font-family:var(--sans)}
+.bar{fill:var(--s1); rx:3}
+.bar:hover{filter:brightness(1.12)}
+
+/* ---- method diagrams ---- */
+.dg{font-family:var(--sans)}
+.dg rect.bx{fill:var(--bg); stroke:var(--line); stroke-width:1}
+.dg rect.bx.hl{stroke:var(--accent)}
+.dg text{fill:var(--muted); font-size:10.5px}
+.dg text.t{fill:var(--fg); font-weight:600; font-size:11px}
+.dg text.s{fill:var(--faint); font-size:9.5px}
+.dg line.ar,.dg path.ar{stroke:var(--faint); stroke-width:1.4; fill:none}
+.dg line.div{stroke:var(--line); stroke-width:1}
+.dg .bad{fill:var(--s2); font-weight:700}
+.dg .good{fill:var(--s1); font-weight:700}
+
+/* ---- lists ---- */
+.also{list-style:none; padding:0; margin:0; display:grid; gap:14px}
+.also li{padding-left:18px; position:relative; color:var(--muted); max-width:70ch}
+.also li::before{content:""; position:absolute; left:0; top:.62em; width:6px; height:6px; border-radius:50%; background:var(--accent); opacity:.5}
+.also strong{color:var(--fg); font-weight:600}
+.prose{max-width:62ch; color:var(--muted)}
+.prose strong{color:var(--fg)}
+
+.stack{display:grid; gap:15px; max-width:74ch}
+.stack__row{display:grid; grid-template-columns:8rem 1fr; gap:16px; align-items:start}
+.stack__v{color:var(--muted)}
+@media (max-width:560px){ .stack__row{grid-template-columns:1fr; gap:3px} }
+
+.roles{list-style:none; padding:0; margin:0; max-width:74ch}
+.roles li{display:flex; justify-content:space-between; gap:16px; padding:11px 0; border-bottom:1px solid var(--line-soft); flex-wrap:wrap}
+.roles li:last-child{border-bottom:0}
+.roles b{font-weight:600}
+.roles .d{color:var(--faint); font-size:.85rem; font-family:var(--mono)}
+
+footer{margin-top:56px; padding-top:26px; border-top:1px solid var(--line); color:var(--faint); font-size:.86rem}
+footer a{color:var(--muted)}
+.fine{margin-top:14px; font-size:.78rem}
+
+/* ---- tooltip ---- */
+#tip{
+  position:fixed; z-index:50; pointer-events:none; opacity:0; transform:translate(-50%,-115%);
+  background:var(--fg); color:var(--bg); padding:5px 9px; border-radius:6px;
+  font-size:.76rem; font-family:var(--mono); white-space:nowrap;
+  transition:opacity .12s;
+}
+#tip.on{opacity:1}
+
+/* ---- reveal: opt-in only once JS confirms it can observe, so content is
+       never hidden by a script failure ---- */
+.js-reveal .rv{opacity:0; transform:translateY(10px); transition:opacity .5s ease, transform .5s ease}
+.js-reveal .rv.in{opacity:1; transform:none}
+@media (prefers-reduced-motion:reduce){
+  .js-reveal .rv{opacity:1; transform:none; transition:none}
+}
+
+@media print{
+  .rail__links,.nav,#tip{display:none}
+  .case{break-inside:avoid; box-shadow:none}
+  body{font-size:11pt}
+}
+</style>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="max-width">
-            <div class="logo"><a href="#">Gopu's <span>Portfolio</span></a></div>
-            <ul class="menu">
-                <li><a class="active" href="#">Home</a></li>
-                <li><a href="#skills">Skills</a></li>
-                <li><a href="#about">About</a></li>
-                <!-- <li><a href="#">Experiences</a></li>
-                <li><a href="#">Achievement</a></li> -->
-                <li><a href="#contact">Contacts</a></li>
-            </ul>
-            <div class="menu-btn">
-                <i class="fas fa-bars"></i>
-            </div>  
-        </div>
+<a class="skip" href="#main">Skip to content</a>
+<div id="tip" role="status" aria-live="polite"></div>
+
+<div class="shell">
+
+  <!-- ================= rail ================= -->
+  <aside class="rail">
+    <p class="kicker" style="margin:0 0 10px">Product Analyst</p>
+    <h2 class="rail__name">Gorav Agarwal</h2>
+    <p class="rail__role">at <b>Amber</b> · Pune, India</p>
+
+    <nav class="nav" aria-label="Sections">
+      <a href="#work">Selected work</a>
+      <a href="#also">Also built</a>
+      <a href="#how">How I work</a>
+      <a href="#stack">Stack</a>
+      <a href="#path">Path</a>
     </nav>
-    <section class="home" id="home">
-        <div class="max-width">
-            <div class="home-content">
-                <div class="text-1">Hello, my name is </div>
-                <div class="text-2">Gorav Agarwal</div>
-                <div class="text-3">And I am a <span>Tech Enthusiast</span></div>
-            </div>
-        </div>
+
+    <div class="rail__links">
+      <a class="btn btn--solid" href="Gorav_Agarwal_Product_Analyst.pdf">Résumé</a>
+      <a class="btn" href="https://www.linkedin.com/in/gourav8152/" rel="me noopener">LinkedIn</a>
+      <a class="btn" href="mailto:goravsitbatch1@gmail.com">Email</a>
+      <button class="btn btn--icon" id="theme" type="button" aria-label="Switch colour theme" title="Switch theme">◐</button>
+    </div>
+  </aside>
+
+  <!-- ================= main ================= -->
+  <main id="main">
+
+    <div class="hero">
+      <h1>I work out <em>why the number moved</em>.</h1>
+      <p class="hero__sub">
+        Product analyst at Amber, a student housing marketplace operating in 250+ cities worldwide.
+        Funnel drops, A/B test results, and the tooling that makes those answers repeatable.
+      </p>
+
+      <dl class="scale">
+        <div><dt class="num">250+</dt><dd>cities in Amber’s markets</dd></div>
+        <div><dt class="num">2M+</dt><dd>beds on the platform</dd></div>
+        <div><dt class="num">3 yrs</dt><dd>at Amber, across three roles</dd></div>
+        <div><dt class="num">2×</dt><dd>company Rewards &amp; Recognition</dd></div>
+      </dl>
+    </div>
+
+    <!-- ============ selected work ============ -->
+    <section id="work">
+      <div class="sec-head"><span class="kicker">Selected work</span></div>
+
+      <!-- ---------- case 1 ---------- -->
+      <article class="case rv">
+        <div class="case__top"><span class="case__n">01</span><span class="kicker">Traffic quality</span></div>
+        <h3>Separating automated traffic from real demand</h3>
+        <dl>
+          <dt>Problem</dt>
+          <dd>A traffic segment's year-on-year growth looked strong while its conversion rate moved the
+            other way. Two signals that should agree, disagreeing.</dd>
+          <dt>Approach</dt>
+          <dd>Automated traffic tends to leave a consistent signature across geography, device and session
+            behaviour. I built a session-level classifier on those signals and recomputed the affected
+            metrics on a clean denominator.</dd>
+          <dt>Outcome</dt>
+          <dd>Once automated sessions were separated out, <mark>both signals reconciled</mark> — the growth
+            and the conversion decline were largely the same artefact. Traffic quality is now part of the
+            standard metric definition rather than an afterthought.</dd>
+        </dl>
+      </article>
+
+      <!-- ---------- case 2 ---------- -->
+      <article class="case rv">
+        <div class="case__top"><span class="case__n">02</span><span class="kicker">Experimentation</span></div>
+        <h3>A pricing change that helped one step and nothing after it</h3>
+        <dl>
+          <dt>Problem</dt>
+          <dd>The available evidence for a pricing change was a cross-sectional comparison between properties
+            that happened to price differently. That design cannot separate price from everything else
+            about a property.</dd>
+          <dt>Approach</dt>
+          <dd>Some properties had actually changed price tier, and the change logs recorded when.
+            That gave me a real before and after. I ran difference-in-differences inside those properties
+            against ones that never switched, over matched windows, and checked the pre-trends lined up.</dd>
+          <dt>Outcome</dt>
+          <dd><mark>A clear, statistically significant gain at the payment step</mark> and
+            <strong>no detectable effect on bookings</strong>. The friction was real, but students who
+            balked simply converted another way. That moved the decision off a revenue case and onto a
+            friction one.</dd>
+        </dl>
+
+        <figure>
+          <div class="fig__head"><span class="fig__title">Why the comparison had to change</span></div>
+          <div class="plot">
+          <svg class="chart dg" viewBox="0 0 560 168" role="img"
+               aria-label="Diagram. A cross-sectional comparison sets two different properties side by side, so price is tangled with city, size, quality and operator. A within-property design compares the same property before and after its own price change, matched against properties that never changed, so the property acts as its own control.">
+            <text class="t" x="10" y="12">Cross-sectional</text>
+            <text class="bad" x="128" y="12" font-size="12">&#10007;</text>
+            <rect class="bx" x="10"  y="24" width="112" height="52" rx="8"></rect>
+            <text class="t" x="22" y="44">Property A</text>
+            <text class="s" x="22" y="60">lower price</text>
+            <rect class="bx" x="150" y="24" width="112" height="52" rx="8"></rect>
+            <text class="t" x="162" y="44">Property B</text>
+            <text class="s" x="162" y="60">higher price</text>
+            <text class="s" x="130" y="54" text-anchor="middle">vs</text>
+            <text x="10" y="98">Different city, size, quality and operator.</text>
+            <text x="10" y="114">The price effect is tangled up with all of it.</text>
+
+            <line class="div" x1="285" y1="4" x2="285" y2="130"></line>
+
+            <text class="t" x="300" y="12">Within-property</text>
+            <text class="good" x="420" y="12" font-size="12">&#10003;</text>
+            <rect class="bx hl" x="300" y="24" width="240" height="52" rx="8"></rect>
+            <line class="div" x1="420" y1="24" x2="420" y2="76"></line>
+            <text class="t" x="312" y="44">Before</text>
+            <text class="s" x="312" y="60">higher price</text>
+            <text class="t" x="432" y="44">After</text>
+            <text class="s" x="432" y="60">lower price</text>
+            <text x="300" y="98">Same property, same city, same operator.</text>
+            <text x="300" y="114">Only the price changed, so it is its own control.</text>
+
+            <text class="s" x="10" y="140">Effects are then differenced against properties that never changed price over the same window,</text>
+            <text class="s" x="10" y="154">after checking the two groups moved in parallel beforehand.</text>
+          </svg>
+          </div>
+          <figcaption>The first comparison is the one people reach for. It is also the one that cannot
+            tell you whether price caused anything.</figcaption>
+        </figure>
+      </article>
+
+      <!-- ---------- case 3 ---------- -->
+      <article class="case rv">
+        <div class="case__top"><span class="case__n">03</span><span class="kicker">Pricing</span></div>
+        <h3>Where conversion breaks against the local market</h3>
+        <dl>
+          <dt>Problem</dt>
+          <dd>Partners needed a defensible reference point for pricing against their own local market rather
+            than a judgement call. The open question was what a property priced well above its local
+            level actually gives up in conversion.</dd>
+          <dt>Approach</dt>
+          <dd>Took what students actually paid per city as the reference rather than listed prices,
+            bucketed every property by how far it sat from its own city's median, and measured the share
+            of properties in each band that booked at all.</dd>
+          <dt>Outcome</dt>
+          <dd>An inverted-U with a sharp edge: <mark>conversion holds a little either side of the local
+            market level, then falls away quickly above it</mark>. That curve is now the reference point
+            for price reviews.</dd>
+        </dl>
+      </article>
+
+      <!-- ---------- case 4 ---------- -->
+      <article class="case rv">
+        <div class="case__top"><span class="case__n">04</span><span class="kicker">Tooling</span></div>
+        <h3>Automating the funnel post-mortem</h3>
+        <dl>
+          <dt>Problem</dt>
+          <dd>Funnel investigations were manual, slow and hard to reproduce. Supply movements, term dates and
+            attribution changes all look like product regressions until you rule them out, and ruling
+            them out took about a week.</dd>
+          <dt>Approach</dt>
+          <dd>I put the method into code. Python and SQL over the warehouse, with a supply check that has to
+            pass before a cause is attributed to UX, plus academic calendar seasonality, traffic-quality
+            exclusion, funnel decomposition, and ranked hypotheses at the end.</dd>
+          <dt>Outcome</dt>
+          <dd>A normal investigation went from <mark>about a week to under an hour</mark>. The bigger
+            win is that it gives the same answer whoever runs it.</dd>
+        </dl>
+
+        <figure>
+          <div class="fig__head"><span class="fig__title">The order the checks run in</span></div>
+          <div class="plot">
+          <svg class="chart dg" viewBox="0 0 560 140" role="img"
+               aria-label="Diagram. Five checks run in order: supply, seasonality, bot exclusion, decomposition, then ranked hypotheses. Any gate can stop the investigation and attribute the cause, and nothing is blamed on product until the first three pass.">
+            <text class="s" x="0" y="11">Runs in order. Any gate can stop the investigation and attribute the cause.</text>
+            <g>
+              <rect class="bx hl" x="2"   y="24" width="100" height="42" rx="8"></rect>
+              <text class="t" x="52"  y="43" text-anchor="middle">Supply</text>
+              <text class="s" x="52"  y="57" text-anchor="middle">is stock there?</text>
+
+              <rect class="bx hl" x="116" y="24" width="100" height="42" rx="8"></rect>
+              <text class="t" x="166" y="43" text-anchor="middle">Seasonality</text>
+              <text class="s" x="166" y="57" text-anchor="middle">term dates?</text>
+
+              <rect class="bx hl" x="230" y="24" width="100" height="42" rx="8"></rect>
+              <text class="t" x="280" y="43" text-anchor="middle">Bot exclusion</text>
+              <text class="s" x="280" y="57" text-anchor="middle">even human?</text>
+
+              <rect class="bx" x="344" y="24" width="100" height="42" rx="8"></rect>
+              <text class="t" x="394" y="43" text-anchor="middle">Decomposition</text>
+              <text class="s" x="394" y="57" text-anchor="middle">which segment?</text>
+
+              <rect class="bx" x="458" y="24" width="100" height="42" rx="8"></rect>
+              <text class="t" x="508" y="43" text-anchor="middle">Hypotheses</text>
+              <text class="s" x="508" y="57" text-anchor="middle">ranked</text>
+            </g>
+            <g class="ar" stroke-linecap="round">
+              <line x1="104" y1="45" x2="112" y2="45"></line><path d="M108 41 L114 45 L108 49"></path>
+              <line x1="218" y1="45" x2="226" y2="45"></line><path d="M222 41 L228 45 L222 49"></path>
+              <line x1="332" y1="45" x2="340" y2="45"></line><path d="M336 41 L342 45 L336 49"></path>
+              <line x1="446" y1="45" x2="454" y2="45"></line><path d="M450 41 L456 45 L450 49"></path>
+            </g>
+            <line class="div" x1="2" y1="88" x2="558" y2="88"></line>
+            <text x="0" y="108">Nothing is attributed to product or UX until the first three gates pass.</text>
+            <text class="s" x="0" y="124">Most &#8220;product regressions&#8221; stop at one of them.</text>
+          </svg>
+          </div>
+          <figcaption>Encoding the order is most of the value. It is what stops the investigation
+            reaching a different conclusion depending on who runs it.</figcaption>
+        </figure>
+      </article>
+
+      <!-- ---------- case 5 ---------- -->
+      <article class="case rv">
+        <div class="case__top"><span class="case__n">05</span><span class="kicker">Data quality</span></div>
+        <h3>A duplicate problem that flipped conclusions</h3>
+        <dl>
+          <dt>Problem</dt>
+          <dd>A student who returns creates several lead records, so any lead-level metric read without
+            deduplication can turn one person into a trend.</dd>
+          <dt>Approach</dt>
+          <dd>I used a structural filter that is known at the point the record is created, so there is no
+            outcome leakage, then re-ran the affected metrics on both bases to quantify the difference.</dd>
+          <dt>Outcome</dt>
+          <dd><mark>A large share of records were duplicates</mark>, and they moved the two key quantities in
+            <strong>opposite directions</strong> — so deduplication is not a uniform correction, it can
+            change a conclusion outright. The filter is now the canonical basis for lead-level reporting.</dd>
+        </dl>
+      </article>
     </section>
-    <section class="about" id="about">
-        <div class="max-width">
-            <h2 class="title">About Me</h2>
-            <div class="about-content">
-                <div class="column left">
-                    <img src="myphoto.jpg" alt="">
-                </div>
-                <div class="column right">
-                    <div class="text">I am <span>Gorav Agarwal </span>currently pursuing B-TECH 3rd year in the stream of Information Technology.</div>
-                    <a href="/image-converter">Go to Image Converter Project</a>
-                </div>
-            </div>
-        </div>
+
+    <!-- ============ also built ============ -->
+    <section id="also">
+      <div class="sec-head"><span class="kicker">Also built</span></div>
+      <ul class="also">
+        <li><strong>Cohort segmentation of the lead base.</strong> Ten populations with very different
+          win rates, now used to decide how each one gets contacted instead of treating them all the
+          same.</li>
+        <li><strong>Property recommendation engine.</strong> Candidate generation and ranking for agents,
+          the chatbot and students, scored with nDCG@10 against a popularity baseline.</li>
+        <li><strong>The reporting layer.</strong> Tableau, Metabase and Looker Studio dashboards used
+          daily by product, supply and ops, plus 100+ hours a month of manual reporting moved onto
+          scheduled pipelines.</li>
+      </ul>
     </section>
-    <section class="skills" id="skills">
-        <div class="max-width">
-            <h2 class="title">Skills</h2>
-            <div class="skills-content">
-                <span class="skill-icon"><img src="https://img.icons8.com/color/40/000000/java-coffee-cup-logo.png"></span>
-                <span class="skill-heading">Java</span>
-                <span class="skill-icon"><img src="https://img.icons8.com/color/40/000000/python.png"></span>
-                <span class="skill-heading">Python</span>
-                <span class="skill-icon"><img src="https://www.php.net/images/logos/php.ico"></span>
-                <span class="skill-heading">PHP</span>
-                <span class="skill-icon"><img src="https://img.icons8.com/color/40/000000/javascript.png"></span>
-                <span class="skill-heading">Javascript</span>
-                <span class="skill-icon"><img src="https://img.icons8.com/color/40/000000/selenium-test-automation.png"></span>
-                <span class="skill-heading">Selenium</span>
-                <span class="skill-icon"><img src="https://img.icons8.com/color/40/000000/css3.png"></span>
-                <span class="skill-heading">CSS</span>
-                <span class="skill-icon"><img src="https://img.icons8.com/color/40/000000/html-5.png"></span>
-                <span class="skill-heading">HTML</span>
-                <span class="skill-icon"><img src="https://img.icons8.com/color/40/000000/git.png"></span>
-                <span class="skill-heading">Git</span>
-            </div>
-        </div>
+
+    <!-- ============ how ============ -->
+    <section id="how">
+      <div class="sec-head"><span class="kicker">How I work</span></div>
+      <div class="prose">
+        <p>Before anyone acts on a number I want to know it is real. Duplicate rows, attribution changes
+          and automated traffic can each produce a confident and completely wrong answer, so I check the
+          denominator before the insight.</p>
+        <p>The other habit is not stopping at the first metric that moves. A lift at one step of the
+          funnel is a hypothesis. The question is whether it survives to bookings, and often it does not.
+          Saying so is part of the job.</p>
+      </div>
     </section>
-    <section class="contact" id="contact">
-        <div class="max-width">
-        <h2 class="title">Contact me</h2>
-        <div class="contact-content">
-        <div class="column left">
-        <div class="text">Get in Touch</div>
-        <div class="icons">
-        <div class="row">
-        <i class="fas fa-user"></i>
-            <div class="info">
-                <div class="head">Name</div>
-                <div class="sub-title">Gorav Agarwal</div>
-            </div>
-        </div>
-            <div class="row">
-                <i class="fas fa-map-marker-alt"></i>
-                    <div class="info">
-                        <div class="head">Address</div>
-                        <div class="sub-title">Siliguri</div>
-                    </div>
-                </div>
-                    <div class="row">
-                    <i class="fas fa-envelope"></i>
-                        <div class="info">
-                            <div class="head">Email</div>
-                            <div class="sub-title"><a href="mailto:goravsitbatch1@gmail.com">Click Here </a></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-    <script src="script.js"></script>
+
+    <!-- ============ stack ============ -->
+    <section id="stack">
+      <div class="sec-head"><span class="kicker">Stack</span></div>
+      <div class="stack">
+        <div class="stack__row"><div class="kicker">Methods</div><div class="stack__v">Funnel and root-cause analysis, A/B testing, causal inference (difference-in-differences), cohort analysis, segmentation, significance testing</div></div>
+        <div class="stack__row"><div class="kicker">Languages</div><div class="stack__v">SQL (Amazon Redshift, PostgreSQL), Python (pandas, NumPy, statsmodels), JavaScript, Google Apps Script</div></div>
+        <div class="stack__row"><div class="kicker">Data &amp; BI</div><div class="stack__v">Google Analytics 4, BigQuery, Tableau, Metabase, Looker Studio, Amplitude, PostHog</div></div>
+      </div>
+    </section>
+
+    <!-- ============ path ============ -->
+    <section id="path">
+      <div class="sec-head"><span class="kicker">Path</span></div>
+      <ul class="roles">
+        <li><b>Product Analyst</b> <span class="d">Jan 2026 — Present</span></li>
+        <li><b>MIS Analyst</b> <span class="d">Jan 2025 — Jan 2026</span></li>
+        <li><b>Catalog Management Executive</b> <span class="d">Jan 2023 — Jan 2025</span></li>
+        <li><b>B.Tech, Information Technology · Siliguri Institute of Technology</b> <span class="d">2019 — 2023</span></li>
+      </ul>
+
+      <footer>
+        <p>Pune, India.</p>
+        <p><a href="mailto:goravsitbatch1@gmail.com">goravsitbatch1@gmail.com</a> ·
+           <a href="https://www.linkedin.com/in/gourav8152/" rel="noopener">linkedin.com/in/gourav8152</a></p>
+        <p class="fine">These case studies describe method and direction. Specific commercial figures are
+          deliberately omitted.</p>
+      </footer>
+    </section>
+
+  </main>
+</div>
+
+<script>
+(function(){
+  /* ---- theme ---- */
+  var KEY='ga-theme', root=document.documentElement, btn=document.getElementById('theme');
+  try{ var saved=localStorage.getItem(KEY); if(saved) root.setAttribute('data-theme',saved); }catch(e){}
+  function mode(){
+    return root.getAttribute('data-theme') ||
+      (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  }
+  btn.addEventListener('click', function(){
+    var next = mode()==='dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try{ localStorage.setItem(KEY,next); }catch(e){}
+    btn.setAttribute('aria-label','Switch to '+(next==='dark'?'light':'dark')+' theme');
+  });
+
+  /* ---- chart tooltip ---- */
+  var tip=document.getElementById('tip');
+  document.querySelectorAll('[data-tip]').forEach(function(el){
+    function show(e){
+      tip.textContent = el.getAttribute('data-tip');
+      var r = el.getBoundingClientRect();
+      tip.style.left = (r.left + r.width/2) + 'px';
+      tip.style.top  = r.top + 'px';
+      tip.classList.add('on');
+    }
+    function hide(){ tip.classList.remove('on'); }
+    el.addEventListener('mouseenter', show);
+    el.addEventListener('mousemove', show);
+    el.addEventListener('mouseleave', hide);
+    el.addEventListener('focus', show);
+    el.addEventListener('blur', hide);
+    el.setAttribute('tabindex','0');
+    el.setAttribute('role','img');
+    el.setAttribute('aria-label', el.getAttribute('data-tip'));
+  });
+
+  /* ---- reveal (progressive enhancement) ---- */
+  if('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches){
+    root.classList.add('js-reveal');               // only now may .rv hide itself
+    var ro=new IntersectionObserver(function(es){
+      es.forEach(function(en){ if(en.isIntersecting){ en.target.classList.add('in'); ro.unobserve(en.target);} });
+    },{rootMargin:'0px 0px -8% 0px'});
+    document.querySelectorAll('.rv').forEach(function(el){ ro.observe(el); });
+    // safety net: if anything is still hidden after load, show it
+    addEventListener('load', function(){
+      setTimeout(function(){
+        document.querySelectorAll('.rv:not(.in)').forEach(function(el){
+          if(el.getBoundingClientRect().top < innerHeight) el.classList.add('in');
+        });
+      }, 400);
+    });
+  }
+
+  /* ---- scroll spy ---- */
+  var links=[].slice.call(document.querySelectorAll('.nav a'));
+  var secs=links.map(function(a){ return document.querySelector(a.getAttribute('href')); }).filter(Boolean);
+  if('IntersectionObserver' in window && secs.length){
+    var so=new IntersectionObserver(function(es){
+      es.forEach(function(en){
+        if(!en.isIntersecting) return;
+        links.forEach(function(a){
+          a.setAttribute('aria-current', a.getAttribute('href')==='#'+en.target.id ? 'true':'false');
+        });
+      });
+    },{rootMargin:'-15% 0px -70% 0px'});
+    secs.forEach(function(s){ so.observe(s); });
+  }
+})();
+</script>
 </body>
 </html>
